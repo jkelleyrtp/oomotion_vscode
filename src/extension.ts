@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { actionList, registerAction } from './actions/action';
+import { Action, SimpleAction, actionList, registerAction } from './actions/action';
 import { EditorData, EditorDataManager } from './editor/editordata';
 import { GlobalData } from './global/globaldata';
 import { getLanguageConfiguration } from './global/language';
@@ -18,6 +18,7 @@ export function activate(context: vscode.ExtensionContext) {
 	for (const action of actionList) {
 		registerAction(context, action);
 	}
+
 	function onDidChangeActiveTextEditor(e: vscode.TextEditor | undefined) {
 		editorData.updateEditorData(e);
 		if (e) { globalData.tree.open(e.document); }
@@ -26,14 +27,14 @@ export function activate(context: vscode.ExtensionContext) {
 	onDidChangeActiveTextEditor(vscode.window.activeTextEditor);
 	vscode.window.onDidChangeActiveTextEditor(onDidChangeActiveTextEditor);
 	console.log(getLanguageConfiguration("typescript"));
-	let intercept_cmd = vscode.commands.registerCommand('type', (ch: { text: string }) => {
-		editorData.map_or_else(x => {
-			x.onCharTyped(ch.text);
-		}, () => {
-			vscode.commands.executeCommand('default:type', ch);
-		})
-	});
-	context.subscriptions.push(intercept_cmd);
+	// let intercept_cmd = vscode.commands.registerCommand('type', (ch: { text: string }) => {
+	// 	editorData.map_or_else(x => {
+	// 		x.onCharTyped(ch.text);
+	// 	}, () => {
+	// 		vscode.commands.executeCommand('default:type', ch);
+	// 	})
+	// });
+	// context.subscriptions.push(intercept_cmd);
 
 	vscode.window.onDidChangeTextEditorSelection(e => {
 		editorData.map(x => { x.updateSelection(e); })
@@ -46,3 +47,4 @@ export function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
 	editorData.updateEditorData(undefined);
 }
+

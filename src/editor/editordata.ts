@@ -140,34 +140,34 @@ export class EditorData {
         }
     }
     onCharTyped(ch: string) {
-        if (this._state.name == 'INSERT') {
-            if (this._state.remaining.length > 0) {
-                if (this._state.remaining.charAt(0) == ch) {
-                    this._state.remaining = this._state.remaining.substring(1);
-                    if (this._state.remaining.length == 0) {
-                        this._state = { name: 'NORMAL', numarg: undefined }
-                        this.changeStateTo('NORMAL');
-                    }
-                } else {
-                    const keys = vscode.workspace.getConfiguration("oomotion").get("gotoNormalKeybinding", "jk");
-                    if (keys.length > this._state.remaining.length) {
-                        vscode.commands.executeCommand("default:type", { text: keys.substring(0, keys.length - this._state.remaining.length) + ch })
-                        this._state.remaining = keys;
-                    } else {
-                        vscode.commands.executeCommand("default:type", { text: ch })
-                    }
-                }
-            } else {
-                this._state.remaining = vscode.workspace.getConfiguration("oomotion").get("gotoNormalKeybinding", "jk");
-                vscode.commands.executeCommand("default:type", { text: ch })
-            }
-        } else {
-            if (utils.isDecimal(ch)) {
-                this._state.numarg = this._state.numarg ? this._state.numarg : 0;
-                this._state.numarg *= 10;
-                this._state.numarg += parseInt(ch);
-            }
-        }
+        // if (this._state.name == 'INSERT') {
+        // if (this._state.remaining.length > 0) {
+        // if (this._state.remaining.charAt(0) == ch) {
+        //     this._state.remaining = this._state.remaining.substring(1);
+        //     if (this._state.remaining.length == 0) {
+        //         this._state = { name: 'NORMAL', numarg: undefined }
+        //         this.changeStateTo('NORMAL');
+        //     }
+        // } else {
+        //     const keys = vscode.workspace.getConfiguration("oomotion").get("gotoNormalKeybinding", "jk");
+        //     if (keys.length > this._state.remaining.length) {
+        //         vscode.commands.executeCommand("default:type", { text: keys.substring(0, keys.length - this._state.remaining.length) + ch })
+        //         this._state.remaining = keys;
+        //     } else {
+        //         vscode.commands.executeCommand("default:type", { text: ch })
+        //     }
+        // }
+        // } else {
+        // this._state.remaining = vscode.workspace.getConfiguration("oomotion").get("gotoNormalKeybinding", "jk");
+        // vscode.commands.executeCommand("default:type", { text: ch })
+        // }
+        // } else {
+        //     if (utils.isDecimal(ch)) {
+        //         this._state.numarg = this._state.numarg ? this._state.numarg : 0;
+        //         this._state.numarg *= 10;
+        //         this._state.numarg += parseInt(ch);
+        //     }
+        // }
     }
     private updateDecoration(newmode: mode.SelectionMode | undefined) {
         this.editor.clearDecoration(this._mode.decorationtype);

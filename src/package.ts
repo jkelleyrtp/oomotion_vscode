@@ -1,19 +1,19 @@
-import assert = require('assert');      
-import * as fs                           from 'fs';                 
-import * as url                          from 'url';                
-import { actionList, Action, ActionKey } from './actions/action'    
-import * as extension                    from './extension'         
-import * as lodash                       from 'lodash';             
-import { State, StateName }              from './editor/editordata';
+import assert = require('assert');
+import * as fs from 'fs';
+import * as url from 'url';
+import { actionList, Action, ActionKey } from './actions/action'
+import * as extension from './extension'
+import * as lodash from 'lodash';
+import { State, StateName } from './editor/editordata';
 
 function getKey(key: ActionKey) {
-    if(typeof key == 'string') {
-        return {"key": key, "mac": key};
-    } else if("mac" in key) {
-        return key;
-    } else {
-        return {"key": key[0], "mac": key[1]};
-    }
+	if (typeof key == 'string') {
+		return { "key": key, "mac": key };
+	} else if ("mac" in key) {
+		return key;
+	} else {
+		return { "key": key[0], "mac": key[1] };
+	}
 }
 function statesPredicate(states: StateName[]) {
 	return states.map(x => `editorTextFocus && oomotion-vscode.state == '${x}'`).join(' || ')
@@ -22,9 +22,9 @@ function statesPredicate(states: StateName[]) {
 export const packagegen = () => {
 	const action_keybindings = actionList.flatMap((x) => {
 		if (x.key && x.key.length > 0) {
-			return x.key.map((k:any) => {
+			return x.key.map((k: any) => {
 				var obj: any = { "command": "oomotion-vscode." + x.name, ...getKey(k) }
-				if(x.when) { obj["when"] = x.when; }
+				if (x.when) { obj["when"] = x.when; }
 				else if (x.state) { obj["when"] = `${statesPredicate(x.state)}`; }
 				return obj;
 			})
@@ -62,7 +62,7 @@ export const packagegen = () => {
 		}, {
 			command: "editor.action.marker.next",
 			key: [['g ]', 'g ]']]
-		},  {
+		}, {
 			command: "editor.action.formatDocument",
 			key: [['space f', 'space f']]
 		}, {
@@ -148,18 +148,25 @@ export const packagegen = () => {
 			key: [['space h', 'space h']]
 		}
 	].flatMap(x => {
-		return x.key.map(k => ({ "command": x.command, "key": k[0], "mac": k[1], "when": `editorTextFocus && oomotion-vscode.state == NORMAL || editorTextFocus && oomotion-vscode.state == EXTEND`}))
-	})
+		return x.key.map(k => ({ "command": x.command, "key": k[0], "mac": k[1], "when": `editorTextFocus && oomotion-vscode.state == NORMAL || editorTextFocus && oomotion-vscode.state == EXTEND` }))
+	});
 
-	const additional = []
+	const additional = [
+		{
+			command: "oomotion-vscode.returnToNormal",
+			key: 'escape',
+			mac: 'escape',
+			when: `editorTextFocus`
+		}
+	];
 
 	const packageJSON = () => ({
 		"name": "oomotion-vscode",
 		"displayName": "Oomotion",
-		"publisher" : "yuantiand",
+		"publisher": "yuantiand",
 		"description": "A textobject-oriented vscode keymap. Inspired by vim, kakoune and helix.",
-		"repository" : "https://github.com/DnailZ/oomotion_vscode",
-		"keywords" : ["keymaps", "vim", "oomotion", "textobject", "kakoune", "helix"],
+		"repository": "https://github.com/DnailZ/oomotion_vscode",
+		"keywords": ["keymaps", "vim", "oomotion", "textobject", "kakoune", "helix"],
 		"version": "0.0.2",
 		"engines": {
 			"vscode": "^1.66.0"
@@ -167,14 +174,14 @@ export const packagegen = () => {
 		"categories": [
 			"Keymaps", "Other"
 		],
-		"icon" : "docs/logo.png",
+		"icon": "docs/logo.png",
 		"activationEvents": [
 			"*"
 		],
 		"main": "./out/extension.js",
 		"contributes": {
 			"commands": actionList.map((x) => ({ "command": "oomotion-vscode." + x.name, "title": `Oomotion: ` + x.title })),
-			"keybindings": Array.prototype.concat(action_keybindings, keyremap),
+			"keybindings": Array.prototype.concat(action_keybindings, keyremap, additional),
 			"configuration": {
 				"title": "Oomotion",
 				"properties": {
@@ -240,7 +247,7 @@ export const packagegen = () => {
 	})
 
 	var namecheck = new Set<string>();
-	for(const a of actionList) {
+	for (const a of actionList) {
 		assert(!namecheck.has(a.name), `duplicated name : ${a.name}`);
 		namecheck.add(a.name);
 	}

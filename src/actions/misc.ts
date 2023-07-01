@@ -34,13 +34,13 @@ class centerAction implements SimpleAction {
     }
 }
 class AlignAction implements Action {
-    name        : string;                                       
-    title       : string;                                       
-    state       : editorData.StateName[] = ['SELECT', 'NORMAL'];
-    key?        : ActionKey[] | undefined;                      
-    willBeRecord: boolean = true;                               
-    canGoBack   : boolean = true;                               
-    constructor( key: ActionKey[]) {
+    name: string;
+    title: string;
+    state: editorData.StateName[] = ['SELECT', 'NORMAL'];
+    key?: ActionKey[] | undefined;
+    willBeRecord: boolean = true;
+    canGoBack: boolean = true;
+    constructor(key: ActionKey[]) {
         this.title = "Align Lines with character";
         this.name = lodash.camelCase(this.title);
         this.key = key;
@@ -53,20 +53,42 @@ class AlignAction implements Action {
     }
     async repeat(data: editorData.EditorData, saved: any): Promise<void> {
         const [savedState, ch] = <[editorData.State, string]>saved;
-        const {obj} = data.editor.getTextObjects(line);
+        const { obj } = data.editor.getTextObjects(line);
         const replacement = obj.map((x) => {
             const pt = new mode.PlainText(x.copy().content)
             return new mode.PlainText(pt.align(ch));
         })
         obj.replace(replacement);
-        
+
         data.changeStateTo('NORMAL');
     }
 }
 
 const CenterAction = SimpleActionMixin(centerAction);
 
+
+class returnToNormalAction implements SimpleAction {
+    name: string;
+    title: string;
+    key: ActionKey[];
+    willBeRecord: boolean = true;
+    canGoBack: boolean = true;
+    state: editorData.StateName[] = ['NORMAL', 'SELECT', 'INSERT'];
+    when = undefined;
+
+    constructor(key: ActionKey[]) {
+        this.title = `Return to Normal Mode`;
+        this.name = "returnToNormal";
+        this.key = key;
+    }
+    async callback(data: editorData.EditorData, state: editorData.State, edit: vscode.TextEditorEdit): Promise<void> {
+        data.changeStateTo('NORMAL');
+    }
+}
+const ReturnToNormalAction = SimpleActionMixin(returnToNormalAction);
+
 export default [
+    new ReturnToNormalAction(['esc']),
     new CenterAction(['space space']),
     new AlignAction(['=']),
 ]

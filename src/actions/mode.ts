@@ -17,11 +17,11 @@ class modeCollapse implements SimpleAction {
     key: ActionKey[];
     willBeRecord: boolean = false;
     canGoBack: boolean = false;
-    state: editorData.StateName[] = ['NORMAL' , 'SELECT'];
+    state: editorData.StateName[] = ['NORMAL', 'SELECT'];
     when = undefined;
     secondMode: mode.SelectionMode | undefined;
 
-    constructor(mode: mode.SelectionMode, key: ActionKey[], secondMode? : mode.SelectionMode) {
+    constructor(mode: mode.SelectionMode, key: ActionKey[], secondMode?: mode.SelectionMode) {
         this.mode = mode;
         this.name = "collapseTo" + utils.camelize(mode.name) + "Motion";
         this.title = `${lodash.startCase(mode.name)} Motion`;
@@ -29,12 +29,12 @@ class modeCollapse implements SimpleAction {
         this.secondMode = secondMode;
     }
     async callback(editorData: editorData.EditorData): Promise<void> {
-        if(editorData.mode === this.mode && this.secondMode) {
+        if (editorData.mode === this.mode && this.secondMode) {
             editorData.changeModeTo(this.secondMode);
         } else {
             editorData.changeModeTo(this.mode);
         }
-        if(editorData.state.name == 'SELECT') {
+        if (editorData.state.name == 'SELECT') {
             editorData.changeStateTo('NORMAL');
         }
     }
@@ -42,24 +42,24 @@ class modeCollapse implements SimpleAction {
 
 const ModeCollapse = SimpleActionMixin(modeCollapse);
 
-import * as char       from '../editor/modes/char';       
-import * as line       from '../editor/modes/line';       
-import * as word       from '../editor/modes/word';       
+import * as char from '../editor/modes/char';
+import * as line from '../editor/modes/line';
+import * as word from '../editor/modes/word';
 import * as treesitter from '../editor/modes/tree-sitter';
-import * as linetree   from '../editor/modes/linetree';   
-import * as lineword   from '../editor/modes/lineword';   
-import * as bigword    from '../editor/modes/bigword';    
-import * as smallword  from '../editor/modes/smallword';  
+import * as linetree from '../editor/modes/linetree';
+import * as lineword from '../editor/modes/lineword';
+import * as bigword from '../editor/modes/bigword';
+import * as smallword from '../editor/modes/smallword';
 
 export default [
-    new ModeCollapse(char, [ "shift+6"]            ),
-    new ModeCollapse(line, [ "x" ]           ),
-    new ModeCollapse(word, [ "w" ], smallword),
-    new ModeCollapse(smallword, [ "alt+w" ]  ),
-    new ModeCollapse(treesitter, [ "t" ]     ),
-    new ModeCollapse(linetree, [ "shift+t" ] ),
-    new ModeCollapse(lineword, [ "shift+x" ] ),
-    new ModeCollapse(bigword, [ "shift+w" ]  ),
+    new ModeCollapse(char, ["shift+6"]),
+    new ModeCollapse(line, ["x"]),
+    new ModeCollapse(word, ["w"], smallword),
+    new ModeCollapse(smallword, ["alt+w"]),
+    new ModeCollapse(treesitter, ["t"]),
+    new ModeCollapse(linetree, ["shift+t"]),
+    new ModeCollapse(lineword, ["shift+x"]),
+    new ModeCollapse(bigword, ["shift+w"]),
 ];
 
 
