@@ -66,7 +66,32 @@ class AlignAction implements Action {
 
 const CenterAction = SimpleActionMixin(centerAction);
 
+class returnToNormalAction implements SimpleAction {
+
+    name: string;
+    title: string;
+    key: ActionKey[];
+    willBeRecord: boolean = false;
+    canGoBack: boolean = false;
+    state: editorData.StateName[] = ['NORMAL', 'SELECT', 'INSERT'];
+    when = undefined;
+
+    constructor(key: ActionKey[]) {
+        this.name = "returnToNormal";
+        this.title = `Return to Normal Mode`;
+        this.key = key;
+    }
+    async callback(data: editorData.EditorData, state: editorData.State): Promise<void> {
+        data.changeStateTo('NORMAL');
+        // Collapse multiple cursors/selections down to a single one.
+        data.editor.selections = data.editor.selections.slice(0, 1);
+    }
+}
+
+const ReturnToNormalAction = SimpleActionMixin(returnToNormalAction);
+
 export default [
+    new ReturnToNormalAction(['escape']),
     new CenterAction(['space space']),
     new AlignAction(['=']),
 ]
